@@ -27,10 +27,10 @@ func main() {
 	v1 := router.Group("/v1")
 	{
 		restaurants := v1.Group("restaurants")
-		restaurants.GET("", getListRestaurant(db))
+		restaurants.GET("", ginrestaurant.ListRestaurantHandler(db))
 		restaurants.POST("", ginrestaurant.CreateRestaurantHandler(db))
 		restaurants.GET("/:restaurant-id", ginrestaurant.GetRestaurantHandler(db))
-		restaurants.PUT("/:restaurant-id", updateRestaurant(db))
+		restaurants.PUT("/:restaurant-id", ginrestaurant.UpdateRestaurantHandler(db))
 	}
 
 	if err := router.Run(); err != nil {
