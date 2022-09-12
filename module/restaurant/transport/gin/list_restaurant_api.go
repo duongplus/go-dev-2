@@ -3,14 +3,14 @@ package ginrestaurant
 import (
 	"github.com/gin-gonic/gin"
 	"go-dev/common"
+	"go-dev/component"
 	restaurantbiz "go-dev/module/restaurant/biz"
 	restaurantmodel "go-dev/module/restaurant/model"
 	storagerestaurant "go-dev/module/restaurant/storage"
-	"gorm.io/gorm"
 	"net/http"
 )
 
-func ListRestaurantHandler(db *gorm.DB) gin.HandlerFunc {
+func ListRestaurantHandler(appCtx component.AppContext) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var paging common.Paging
 
@@ -28,15 +28,19 @@ func ListRestaurantHandler(db *gorm.DB) gin.HandlerFunc {
 			return
 		}
 
-		store := storagerestaurant.NewSqlStore(db)
-		biz := restaurantbiz.ListRestaurantStore(store)
+		store := storagerestaurant.NewSqlStore(appCtx.GetMainDBConnection())
+		biz := restaurantbiz.NewListRestaurantBiz(store)
 
-		result, err := biz.ListRestaurant(c.Request.Context(), &filter, &paging)
+		result, err := biz.GetListRestaurant(c.Request.Context(), &filter, &paging)
 		if err != nil {
 			c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
 			return
 		}
 
-		c.JSON(http.StatusOK, gin.H{"data": result, "paging": paging})
+		for i := range result {
+			result[i].Mask(true)
+		}
+
+		c.JSON(http.StatusOK, common.NewSuccessResponse(result, paging, filter))
 	}
 }

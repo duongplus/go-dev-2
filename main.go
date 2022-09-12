@@ -2,8 +2,9 @@ package main
 
 import (
 	"github.com/gin-gonic/gin"
+	"go-dev/component"
+	"go-dev/middleware"
 	"go-dev/module/restaurant/model"
-	ginrestaurant "go-dev/module/restaurant/transport/gin"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"log"
@@ -24,14 +25,11 @@ func main() {
 
 	router := gin.Default()
 
-	v1 := router.Group("/v1")
-	{
-		restaurants := v1.Group("restaurants")
-		restaurants.GET("", ginrestaurant.ListRestaurantHandler(db))
-		restaurants.POST("", ginrestaurant.CreateRestaurantHandler(db))
-		restaurants.GET("/:restaurant-id", ginrestaurant.GetRestaurantHandler(db))
-		restaurants.PUT("/:restaurant-id", ginrestaurant.UpdateRestaurantHandler(db))
-	}
+	router.Use(middleware.Recover())
+
+	appCtx := component.NewAppContext(db)
+
+	mainRoute(router, appCtx)
 
 	if err := router.Run(); err != nil {
 

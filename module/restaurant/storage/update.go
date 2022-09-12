@@ -2,6 +2,7 @@ package storagerestaurant
 
 import (
 	"context"
+	"go-dev/common"
 	restaurantmodel "go-dev/module/restaurant/model"
 )
 
@@ -10,7 +11,7 @@ func (store *sqlStore) UpdateRestaurant(ctx context.Context,
 	data *restaurantmodel.RestaurantUpdate,
 ) error {
 	if err := store.db.Where(cond).Updates(data).Error; err != nil {
-		return err
+		return common.ErrDB(err)
 	}
 	return nil
 }

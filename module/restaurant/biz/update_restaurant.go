@@ -27,7 +27,7 @@ func NewUpdateRestaurantBiz(store UpdateRestaurantStore) *updateRestaurantBiz {
 }
 
 func (biz *updateRestaurantBiz) UpdateRestaurantById(ctx context.Context, id int, data *restaurantmodel.RestaurantUpdate) error {
-	if _, err := biz.store.FindRestaurant(ctx, map[string]interface{}{"id": id}); err != nil {
+	if _, err := biz.store.FindRestaurant(ctx, map[string]interface{}{"id": id, "status": 1}); err != nil {
 		return err
 	}
 
