@@ -15,7 +15,10 @@ func (store *sqlStore) ListRestaurant(ctx context.Context,
 
 	db := store.db
 
-	db = db.Where("status = 1")
+	db = db.
+		Table(restaurantmodel.Restaurant{}.TableName()).
+		Where("status = 1").
+		Count(&paging.Total)
 
 	if v := filter.OwnerId; v > 0 {
 		db = db.Where("owner_id = ?", v)
@@ -30,8 +33,7 @@ func (store *sqlStore) ListRestaurant(ctx context.Context,
 		db = db.Offset(offset)
 	}
 
-	if err := db.Table(restaurantmodel.Restaurant{}.TableName()).
-		Count(&paging.Total).
+	if err := db.
 		Limit(paging.Limit).
 		Order("id desc").
 		Find(&result).Error; err != nil {

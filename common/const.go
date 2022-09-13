@@ -9,4 +9,6 @@ const (
 const (
 	Restaurants       = "restaurants"
 	RestaurantIdParam = "restaurant-id"
+	Upload            = "upload"
+	ImageIds          = "image-ids"
 )

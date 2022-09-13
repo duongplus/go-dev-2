@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/gin-gonic/gin"
 	"go-dev/component"
+	"go-dev/component/uploadprovider"
 	"go-dev/middleware"
 	"go-dev/module/restaurant/model"
 	"gorm.io/driver/mysql"
@@ -15,6 +16,13 @@ import (
 
 func main() {
 	dsn := os.Getenv("DBConnStr")
+	s3BucketName := os.Getenv("S3BucketName")
+	s3Region := os.Getenv("S3Region")
+	s3APIKey := os.Getenv("S3APIKey")
+	s3SecretKey := os.Getenv("S3SecretKey")
+	s3Domain := os.Getenv("S3Domain")
+
+	s3Provider := uploadprovider.NewS3Provider(&s3BucketName, s3Region, s3APIKey, s3SecretKey, s3Domain)
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 
 	if err != nil {
@@ -27,7 +35,7 @@ func main() {
 
 	router.Use(middleware.Recover())
 
-	appCtx := component.NewAppContext(db)
+	appCtx := component.NewAppContext(db, s3Provider)
 
 	mainRoute(router, appCtx)
 
